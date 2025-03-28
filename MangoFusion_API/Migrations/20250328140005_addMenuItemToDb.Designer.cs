@@ -4,6 +4,7 @@ using MangoFusion_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MangoFusion_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250328140005_addMenuItemToDb")]
+    partial class addMenuItemToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,98 +128,6 @@ namespace MangoFusion_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MenuItems");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Category = "Appetizer",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Spring Roll",
-                            Price = 7.9900000000000002,
-                            SpecialTag = ""
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Category = "Appetizer",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Samosa",
-                            Price = 8.9900000000000002,
-                            SpecialTag = ""
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Category = "Appetizer",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Soup",
-                            Price = 8.9900000000000002,
-                            SpecialTag = "Best Seller"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Category = "Entrée",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Noodles",
-                            Price = 10.99,
-                            SpecialTag = ""
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Category = "Entrée",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Pav Bhaji",
-                            Price = 12.99,
-                            SpecialTag = "Top Rated"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Category = "Entrée",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Paneer Pizza",
-                            Price = 11.99,
-                            SpecialTag = ""
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Category = "Dessert",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Mango Paradise",
-                            Price = 13.99,
-                            SpecialTag = "Chef's Special"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Category = "Dessert",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Carrot Love",
-                            Price = 4.9900000000000002,
-                            SpecialTag = ""
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Category = "Dessert",
-                            Description = "Fusc tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                            Image = "",
-                            Name = "Sweet Rolls",
-                            Price = 4.9900000000000002,
-                            SpecialTag = "Chef's Special"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
