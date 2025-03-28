@@ -25,12 +25,12 @@ namespace MangoFusion_API.Controllers
         [HttpGet]
         public IActionResult GetMenuItems()
         {
-            _response.Result=_db.MenuItems.ToList();
+            _response.Result = _db.MenuItems.ToList();
             _response.StatusCode = HttpStatusCode.OK;
             return Ok(_response);
         }
 
-        [HttpGet("{id:int}",Name ="GetMenuItem")]
+        [HttpGet("{id:int}", Name = "GetMenuItem")]
         public IActionResult GetMenuItem(int id)
         {
             if (id == 0)
@@ -47,13 +47,13 @@ namespace MangoFusion_API.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<ApiResponse>> CreateMenuItem([FromForm]MenuItemCreateDTO menuItemCreateDTO)
+        public async Task<ActionResult<ApiResponse>> CreateMenuItem([FromForm] MenuItemCreateDTO menuItemCreateDTO)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    if(menuItemCreateDTO.File==null || menuItemCreateDTO.File.Length == 0)
+                    if (menuItemCreateDTO.File == null || menuItemCreateDTO.File.Length == 0)
                     {
                         _response.IsSuccess = false;
                         _response.StatusCode = HttpStatusCode.BadRequest;
@@ -72,7 +72,7 @@ namespace MangoFusion_API.Controllers
                         System.IO.File.Delete(filePath);
                     }
                     //uploading the image
-                    using(var stream = new FileStream(filePath, FileMode.Create))
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await menuItemCreateDTO.File.CopyToAsync(stream);
                     }
@@ -84,7 +84,7 @@ namespace MangoFusion_API.Controllers
                         Price = menuItemCreateDTO.Price,
                         Category = menuItemCreateDTO.Category,
                         SpecialTag = menuItemCreateDTO.SpecialTag,
-                        Image = "images/"+ menuItemCreateDTO.File.FileName
+                        Image = "images/" + menuItemCreateDTO.File.FileName
                     };
 
                     _db.MenuItems.Add(menuItem);
@@ -100,7 +100,7 @@ namespace MangoFusion_API.Controllers
                     _response.IsSuccess = false;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.ErrorMessages
@@ -111,13 +111,13 @@ namespace MangoFusion_API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<ApiResponse>> UpdateMenuItem(int id,[FromForm] MenuItemUpdateDTO menuItemUpdateDTO)
+        public async Task<ActionResult<ApiResponse>> UpdateMenuItem(int id, [FromForm] MenuItemUpdateDTO menuItemUpdateDTO)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    if (menuItemUpdateDTO == null || menuItemUpdateDTO.Id!=id)
+                    if (menuItemUpdateDTO == null || menuItemUpdateDTO.Id != id)
                     {
                         _response.IsSuccess = false;
                         _response.StatusCode = HttpStatusCode.BadRequest;
@@ -139,7 +139,7 @@ namespace MangoFusion_API.Controllers
                     menuItemFromDb.Category = menuItemUpdateDTO.Category;
                     menuItemFromDb.SpecialTag = menuItemUpdateDTO.SpecialTag;
 
-                    if(menuItemUpdateDTO.File!=null && menuItemUpdateDTO.File.Length > 0)
+                    if (menuItemUpdateDTO.File != null && menuItemUpdateDTO.File.Length > 0)
                     {
                         var imagesPath = Path.Combine(_env.WebRootPath, "images");
                         if (!Directory.Exists(imagesPath))
@@ -161,10 +161,61 @@ namespace MangoFusion_API.Controllers
                         {
                             await menuItemUpdateDTO.File.CopyToAsync(stream);
                         }
-                        menuItemFromDb.Image = "images/" + menuItemUpdateDTO.File.FileName; 
+                        menuItemFromDb.Image = "images/" + menuItemUpdateDTO.File.FileName;
                     }
 
                     _db.MenuItems.Update(menuItemFromDb);
+                    await _db.SaveChangesAsync();
+
+                    _response.StatusCode = HttpStatusCode.NoContent;
+                    return Ok(_response);
+
+                }
+                else
+                {
+                    _response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = [ex.ToString()];
+            }
+
+            return BadRequest(_response);
+        }
+
+
+        [HttpDelete]
+        public async Task<ActionResult<ApiResponse>> DeleteMenuItem(int id)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (id == 0)
+                    {
+                        _response.IsSuccess = false;
+                        _response.StatusCode = HttpStatusCode.BadRequest;
+                        return BadRequest(_response);
+                    }
+
+                    MenuItem? menuItemFromDb = await _db.MenuItems.FirstOrDefaultAsync(u => u.Id == id);
+
+                    if (menuItemFromDb == null)
+                    {
+                        _response.IsSuccess = false;
+                        _response.StatusCode = HttpStatusCode.NotFound;
+                        return NotFound(_response);
+                    }
+
+                    var filePath_OldFile = Path.Combine(_env.WebRootPath, menuItemFromDb.Image);
+                    if (System.IO.File.Exists(filePath_OldFile))
+                    {
+                        System.IO.File.Delete(filePath_OldFile);
+                    }
+                    _db.MenuItems.Remove(menuItemFromDb);
                     await _db.SaveChangesAsync();
 
                     _response.StatusCode = HttpStatusCode.NoContent;
