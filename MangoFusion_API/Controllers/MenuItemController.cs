@@ -2,6 +2,7 @@
 using MangoFusion_API.Models;
 using MangoFusion_API.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace MangoFusion_API.Controllers
@@ -100,6 +101,82 @@ namespace MangoFusion_API.Controllers
                 }
             }
             catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = [ex.ToString()];
+            }
+
+            return BadRequest(_response);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<ApiResponse>> UpdateMenuItem(int id,[FromForm] MenuItemUpdateDTO menuItemUpdateDTO)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (menuItemUpdateDTO == null || menuItemUpdateDTO.Id!=id)
+                    {
+                        _response.IsSuccess = false;
+                        _response.StatusCode = HttpStatusCode.BadRequest;
+                        return BadRequest(_response);
+                    }
+
+                    MenuItem? menuItemFromDb = await _db.MenuItems.FirstOrDefaultAsync(u => u.Id == id);
+
+                    if (menuItemFromDb == null)
+                    {
+                        _response.IsSuccess = false;
+                        _response.StatusCode = HttpStatusCode.NotFound;
+                        return NotFound(_response);
+                    }
+
+                    menuItemFromDb.Name = menuItemUpdateDTO.Name;
+                    menuItemFromDb.Description = menuItemUpdateDTO.Description;
+                    menuItemFromDb.Price = menuItemUpdateDTO.Price;
+                    menuItemFromDb.Category = menuItemUpdateDTO.Category;
+                    menuItemFromDb.SpecialTag = menuItemUpdateDTO.SpecialTag;
+
+                    if(menuItemUpdateDTO.File!=null && menuItemUpdateDTO.File.Length > 0)
+                    {
+                        var imagesPath = Path.Combine(_env.WebRootPath, "images");
+                        if (!Directory.Exists(imagesPath))
+                        {
+                            Directory.CreateDirectory(imagesPath);
+                        }
+                        var filePath = Path.Combine(imagesPath, menuItemUpdateDTO.File.FileName);
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        var filePath_OldFile = Path.Combine(_env.WebRootPath, menuItemFromDb.Image);
+                        if (System.IO.File.Exists(filePath_OldFile))
+                        {
+                            System.IO.File.Delete(filePath_OldFile);
+                        }
+                        //uploading the image
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await menuItemUpdateDTO.File.CopyToAsync(stream);
+                        }
+                        menuItemFromDb.Image = "images/" + menuItemUpdateDTO.File.FileName; 
+                    }
+
+                    _db.MenuItems.Update(menuItemFromDb);
+                    await _db.SaveChangesAsync();
+
+                    _response.StatusCode = HttpStatusCode.NoContent;
+                    return Ok(_response);
+
+                }
+                else
+                {
+                    _response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.ErrorMessages
