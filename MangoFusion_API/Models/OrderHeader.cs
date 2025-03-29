@@ -17,7 +17,7 @@ namespace MangoFusion_API.Models
 
         public string ApplicationUserId { get; set; } = string.Empty;
         [ForeignKey("ApplicationUserId")]
-        public ApplicationUser ApplicationUser { get; set; } = new ();
+        public ApplicationUser? ApplicationUser { get; set; }
 
         public double OrderTotal { get; set; }
         public string Status { get; set; }=string.Empty;
