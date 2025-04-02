@@ -13,6 +13,6 @@ namespace MangoFusion_API.Models.Dto
         public string SpecialTag { get; set; } = string.Empty;
         [Range(1, 1000)]
         public double Price { get; set; }
-        public IFormFile File { get; set; } = null!;
+        public IFormFile? File { get; set; }
     }
 }
