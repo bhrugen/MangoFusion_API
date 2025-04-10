@@ -2,6 +2,7 @@
 using MangoFusion_API.Models;
 using MangoFusion_API.Models.Dto;
 using MangoFusion_API.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
@@ -9,7 +10,7 @@ using System.Net;
 
 namespace MangoFusion_API.Controllers
 {
-
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OrderHeaderController : Controller
@@ -26,6 +27,13 @@ namespace MangoFusion_API.Controllers
         [HttpGet]
         public ActionResult<ApiResponse> GetOrders(string userId="")
         {
+            if (string.IsNullOrEmpty(userId) && !User.IsInRole(SD.Role_Admin))
+            {
+                _response.Result = new List<OrderHeader>();
+                _response.IsSuccess = false;
+                _response.StatusCode = HttpStatusCode.Unauthorized;
+                return BadRequest(_response);
+            }
             IEnumerable<OrderHeader> orderHeaderList = _db.OrderHeaders.Include(u=>u.OrderDetails)
                 .ThenInclude(u=>u.MenuItem).OrderByDescending(u=>u.OrderHeaderId);
 
@@ -127,6 +135,7 @@ namespace MangoFusion_API.Controllers
         }
 
         [HttpPut("{orderId:int}")]
+        [Authorize(Roles = SD.Role_Admin)]
         public ActionResult<ApiResponse> UpdateOrder(int orderId, [FromBody] OrderHeaderUpdateDTO orderHeaderDTO)
         {
             try

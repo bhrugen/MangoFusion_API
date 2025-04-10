@@ -2,6 +2,7 @@
 using MangoFusion_API.Models;
 using MangoFusion_API.Models.Dto;
 using MangoFusion_API.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -9,6 +10,7 @@ namespace MangoFusion_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrderDetailsController : Controller
     {
         private readonly ApplicationDbContext _db;
