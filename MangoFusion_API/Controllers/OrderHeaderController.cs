@@ -2,6 +2,7 @@
 using MangoFusion_API.Models;
 using MangoFusion_API.Models.Dto;
 using MangoFusion_API.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
@@ -11,6 +12,7 @@ namespace MangoFusion_API.Controllers
 {
 
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class OrderHeaderController : Controller
     {
@@ -33,8 +35,19 @@ namespace MangoFusion_API.Controllers
             {
                 orderHeaderList = orderHeaderList.Where(u => u.ApplicationUserId == userId);
             }
+            else
+            {
+                if (User.IsInRole(SD.Role_Admin))
+                    {
+                    _response.Result = orderHeaderList;
+                }
+                else
+                {
+                    _response.Result = new List<OrderHeader>();
+                }
+            }
 
-            _response.Result = orderHeaderList;
+                
             _response.StatusCode=HttpStatusCode.OK;
             return Ok(_response);
         }
