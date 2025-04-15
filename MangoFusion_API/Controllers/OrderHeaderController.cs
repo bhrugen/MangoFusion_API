@@ -34,6 +34,7 @@ namespace MangoFusion_API.Controllers
             if (!string.IsNullOrEmpty(userId))
             {
                 orderHeaderList = orderHeaderList.Where(u => u.ApplicationUserId == userId);
+                _response.Result = orderHeaderList;
             }
             else
             {
